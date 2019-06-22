@@ -268,6 +268,12 @@ class IotWebConf
      */
     void handleNotFound();
 
+ /**
+     * Specify a callback method, that will be called upon led status change.
+     * Should be called before init()!
+     */
+    void setStatusCallback( std::function<void(bool value)> func );
+
     /**
      * Specify a callback method, that will be called upon WiFi connection success.
      * Should be called before init()!
@@ -420,6 +426,7 @@ class IotWebConf
     byte _state = IOTWEBCONF_STATE_BOOT;
     unsigned long _apStartTimeMs = 0;
     byte _apConnectionStatus = IOTWEBCONF_AP_CONNECTION_STATE_NC;
+    std::function<void(bool value)> _statusCallback = NULL;
     std::function<void()> _wifiConnectionCallback = NULL;
     std::function<void()> _configSavedCallback = NULL;
     std::function<boolean()> _formValidator = NULL;

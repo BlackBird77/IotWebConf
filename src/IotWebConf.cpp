@@ -21,7 +21,7 @@
 # endif
 #endif
 
-#define IOTWEBCONF_STATUS_ENABLED (this->_statusPin >= 0)
+#define IOTWEBCONF_STATUS_ENABLED (this->_statusPin >= 0 || this->_statusCallback != NULL)
 
 IotWebConfParameter::IotWebConfParameter()
 {
@@ -128,8 +128,15 @@ boolean IotWebConf::init()
   }
   if (IOTWEBCONF_STATUS_ENABLED)
   {
-    pinMode(this->_statusPin, OUTPUT);
-    digitalWrite(this->_statusPin, IOTWEBCONF_STATUS_ON);
+    if (this->_statusPin != -1)
+    {
+      pinMode(this->_statusPin, OUTPUT);
+      digitalWrite(this->_statusPin, IOTWEBCONF_STATUS_ON);
+    }
+    if (this->_statusCallback != NULL)
+    {
+      this->_statusCallback(IOTWEBCONF_STATUS_ON);
+    }
   }
 
   // -- Load configuration from EEPROM.
@@ -347,6 +354,11 @@ void IotWebConf::configSaveConfigVersion()
   {
     EEPROM.write(IOTWEBCONF_CONFIG_START + t, this->_configVersion[t]);
   }
+}
+
+void IotWebConf::setStatusCallback( std::function<void(bool value)> func )
+{
+  this->_statusCallback = func;
 }
 
 void IotWebConf::setWifiConnectionCallback( std::function<void()> func )
@@ -1037,7 +1049,10 @@ void IotWebConf::doBlink()
     {
       this->_blinkState = 1 - this->_blinkState;
       this->_lastBlinkTime = now;
-      digitalWrite(this->_statusPin, this->_blinkState);
+      if (this->_statusPin != -1)
+        digitalWrite(this->_statusPin, this->_blinkState);
+      if (this->_statusCallback != NULL)
+        this->_statusCallback(this->_blinkState);
     }
   }
 }
