@@ -372,6 +372,11 @@ class IotWebConf
     void setApTimeoutMs(unsigned long apTimeoutMs) { this->_apTimeoutMs = apTimeoutMs; };
 
     /**
+     * Force Default Password
+     */
+    void setForceDefaultPassword(boolean value) { this->_forceDefaultPassword = value; };
+
+    /**
      * Returns the actual value of the AP timeout in use.
      */
     unsigned long getApTimeoutMs() { return this->_apTimeoutMs; };
